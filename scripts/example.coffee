@@ -10,6 +10,9 @@
 
 module.exports = (robot) ->
 
+  robot.router.get "/", (req, res) ->
+    res.send "ok"
+
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
