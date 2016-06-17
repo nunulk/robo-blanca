@@ -14,7 +14,8 @@ module.exports = (robot) ->
       res.status(404).send 'not found' + event_type
       return
 
-    robot.messageRoom 'developers', event_type
+    data = req.body
+    robot.messageRoom 'developers', 'pull request created.' + data
     res.status(200).send 'ok'
 
   isCorrectSignature = (signature, body) ->
