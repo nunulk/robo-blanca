@@ -1,3 +1,13 @@
+# Description:
+#   assigns random reviewer for a pull request (for webhook).
+#
+# Configuration:
+#   HUBOT_GITHUB_TOKEN (required)
+#   HUBOT_GITHUB_ORG (required)
+#   HUBOT_GITHUB_REVIEWER_TEAM (required)
+#     github team id. this script randomly picks a reviewer from this team members.
+#
+
 Lotto = require "hubot-reviewer-lotto"
 crypto = require 'crypto'
 
