@@ -65,7 +65,7 @@ module.exports = (robot) ->
       return
 
     data = req.body
-    if data.action not in ['opened', 'reopened']
+    if data.action not in ['opened', 'reopened', 'labeled']
       return res.end ""
 
     repo = data.repository.name
