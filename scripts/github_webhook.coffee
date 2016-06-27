@@ -81,14 +81,14 @@ module.exports = (robot) ->
 
     data = req.body
     if data.action != 'labeled'
-      return res.send "labeled event is only acceptable."
+      return res.send "labeled event is only acceptable. #{data.action}"
 
     if data.label == undefined
       return res.send "label is not defined."
 
     label = data.label.name
     if labels.length != 0 and labels.indexOf(label) != -1
-      return res.send "label is not matched."
+      return res.send "label is not matched. #{labels}, #{label}"
 
     repo = data.repository.name
     pr   = data.pull_request.number
@@ -121,7 +121,7 @@ module.exports = (robot) ->
           cb null, {reviewers: res}
 
       (ctx, cb) ->
-        robot.messageRoom slack_team, "looking for the pr...\n#{prParams}"
+        robot.messageRoom slack_team, "looking for the pr...\n#{prParams.user}, #{prParams.repo}, #{prParams.number}"
         # check if pull req exists
         gh.pullRequests.get prParams, (err, res) ->
           return cb "error on getting pull request: #{err.toString()}" if err?
@@ -161,7 +161,7 @@ module.exports = (robot) ->
           url = reviewer.avatar_url
           url = "#{url}t=#{Date.now()}" # cache buster
           url = url.replace(/(#.*|$)/, '#.png') # hipchat needs image-ish url to display inline image
-          msg.send url
+          res.send url
 
         # update stats
         stats = (robot.brain.get STATS_KEY) or {}
