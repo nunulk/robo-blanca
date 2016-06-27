@@ -67,37 +67,7 @@ module.exports = (robot) ->
       HUBOT_GITHUB_REVIEWER_TEAM: #{ghReviwerTeam}
     """
 
-  robot.router.post "/github/webhook", (req, res) ->
-    event_type = req.get 'X-Github-Event'
-    signature = req.get 'X-Hub-Signature'
-
-    # unless isCorrectSignature signature, req.body
-    #   res.status(401).send 'unauthorized'
-    #   return
-
-    if event_type != 'pull_request'
-      res.status(404).send 'not found' + event_type
-      return
-
-    data = req.body
-    if data.action != 'labeled'
-      return res.send "labeled event is only acceptable. #{data.action}"
-
-    if data.label == undefined
-      return res.send "label is not defined."
-
-    label = data.label.name
-    if labels.length != 0 and labels.indexOf(label) != -1
-      return res.send "label is not matched. #{labels}, #{label}"
-
-    repo = data.repository.name
-    pr   = data.pull_request.number
-    polite = false
-    prParams =
-      user: ghOrg
-      repo: repo
-      number: pr
-
+  reviewer_lotto = (robot, response, prParams) ->
     gh = new GitHubApi version: "3.0.0"
     gh.authenticate {type: "oauth", token: ghToken}
 
@@ -144,7 +114,7 @@ module.exports = (robot) ->
       (ctx, cb) ->
         # post a comment
         {reviewer} = ctx
-        body = "@#{reviewer.login} " + if polite then politeMessage else normalMessage
+        body = "@#{reviewer.login} " + if prParams.polite then politeMessage else normalMessage
         params = _.extend { body }, prParams
         gh.issues.createComment params, (err, res) -> cb err, ctx
 
@@ -161,7 +131,7 @@ module.exports = (robot) ->
           url = reviewer.avatar_url
           url = "#{url}t=#{Date.now()}" # cache buster
           url = url.replace(/(#.*|$)/, '#.png') # hipchat needs image-ish url to display inline image
-          res.send url
+          response.send url
 
         # update stats
         stats = (robot.brain.get STATS_KEY) or {}
@@ -174,8 +144,68 @@ module.exports = (robot) ->
     ], (err, res) ->
       if err?
         robot.messageRoom slack_team, "an error occured.\n#{err}"
+        return response.send "error"
+    return response.send "success"
 
-    res.status(200).send 'ok'
+  robot.respond /reviewer reset stats/i, (msg) ->
+    robot.brain.set STATS_KEY, {}
+    msg.reply "Reset reviewer stats!"
+
+  robot.respond /reviewer show stats$/i, (msg) ->
+    stats = robot.brain.get STATS_KEY
+    msgs = ["login, percentage, num assigned"]
+    total = 0
+    for login, count of stats
+      total += count
+    for login, count of stats
+      percentage = Math.floor(count * 100.0 / total)
+      msgs.push "#{login}, #{percentage}%, #{count}"
+    msg.reply msgs.join "\n"
+
+  robot.respond /reviewer for ([\w-\.]+) (\d+)( polite)?$/i, (msg) ->
+    repo = msg.match[1]
+    pr   = msg.match[2]
+    polite = msg.match[3]?
+    params =
+      user: ghOrg
+      repo: repo
+      number: pr
+      polite: polite
+
+    return reviewer_lotto robot, msg, params
+
+  robot.router.post "/github/webhook", (req, res) ->
+    event_type = req.get 'X-Github-Event'
+    signature = req.get 'X-Hub-Signature'
+
+    # unless isCorrectSignature signature, req.body
+    #   res.status(401).send 'unauthorized'
+    #   return
+
+    if event_type != 'pull_request'
+      res.status(404).send 'not found' + event_type
+      return
+
+    data = req.body
+    if data.action != 'labeled'
+      return res.send "labeled event is only acceptable. #{data.action}"
+
+    if data.label == undefined
+      return res.send "label is not defined."
+
+    label = data.label.name
+    if labels.length != 0 and labels.indexOf(label) == -1
+      return res.send "label is not matched. #{labels}, #{label}"
+
+    repo = data.repository.name
+    pr   = data.pull_request.number
+    polite = false
+    prParams =
+      user: ghOrg
+      repo: repo
+      number: pr
+
+    return reviewer_lotto robot, res, prParams
 
   isCorrectSignature = (signature, body) ->
     if signature == undefined
