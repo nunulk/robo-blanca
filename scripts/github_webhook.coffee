@@ -14,6 +14,20 @@ GitHubApi = require "github"
 weighted  = require "weighted"
 crypto    = require 'crypto'
 
+s_to_a = (s) ->
+  console.log(s)
+  if s == undefined
+    return []
+
+  a =s.split(',').map((e) ->
+    return e.trim()
+  )
+
+  if a.length == 1 && a[0] == ''
+    return []
+
+  return a
+
 module.exports = (robot) ->
   ghToken       = process.env.HUBOT_GITHUB_TOKEN
   ghOrg         = process.env.HUBOT_GITHUB_ORG
@@ -22,7 +36,7 @@ module.exports = (robot) ->
   normalMessage = process.env.HUBOT_REVIEWER_LOTTO_MESSAGE || "Please review this."
   politeMessage = process.env.HUBOT_REVIEWER_LOTTO_POLITE_MESSAGE || "#{normalMessage} :bow::bow::bow::bow:"
   debug         = process.env.HUBOT_REVIEWER_LOTTO_DEBUG in ["1", "true"]
-
+  labels        = s_to_a(process.env.HUBOT_REVIEWER_LOTTO_LABELS)
   STATS_KEY     = 'reviewer-lotto-stats'
 
   # draw lotto - weighted random selection
@@ -65,7 +79,15 @@ module.exports = (robot) ->
       return
 
     data = req.body
-    if data.action not in ['opened', 'reopened', 'labeled']
+    if data.action != 'labeled'
+      return res.end ""
+
+    if data.label == undefined
+      return res.end ""
+    end
+
+    label = data.label.name
+    if labels.length != 0 and labels.indexOf(label) != -1
       return res.end ""
 
     repo = data.repository.name
