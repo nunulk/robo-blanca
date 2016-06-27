@@ -37,6 +37,7 @@ module.exports = (robot) ->
   politeMessage = process.env.HUBOT_REVIEWER_LOTTO_POLITE_MESSAGE || "#{normalMessage} :bow::bow::bow::bow:"
   debug         = process.env.HUBOT_REVIEWER_LOTTO_DEBUG in ["1", "true"]
   labels        = s_to_a(process.env.HUBOT_REVIEWER_LOTTO_LABELS)
+  slack_team    = process.env.HUBOT_SLACK_TEAM
   STATS_KEY     = 'reviewer-lotto-stats'
 
   # draw lotto - weighted random selection
@@ -80,14 +81,14 @@ module.exports = (robot) ->
 
     data = req.body
     if data.action != 'labeled'
-      return res.send ""
+      return res.send "labeled event is only acceptable."
 
     if data.label == undefined
-      return res.send ""
+      return res.send "label is not defined."
 
     label = data.label.name
     if labels.length != 0 and labels.indexOf(label) != -1
-      return res.send ""
+      return res.send "label is not matched."
 
     repo = data.repository.name
     pr   = data.pull_request.number
@@ -96,8 +97,6 @@ module.exports = (robot) ->
       user: ghOrg
       repo: repo
       number: pr
-
-    console.log(prParams)
 
     gh = new GitHubApi version: "3.0.0"
     gh.authenticate {type: "oauth", token: ghToken}
@@ -122,6 +121,7 @@ module.exports = (robot) ->
           cb null, {reviewers: res}
 
       (ctx, cb) ->
+        robot.messageRoom slack_team, "looking for the pr...\n#{prParams}"
         # check if pull req exists
         gh.pullRequests.get prParams, (err, res) ->
           return cb "error on getting pull request: #{err.toString()}" if err?
@@ -156,7 +156,7 @@ module.exports = (robot) ->
 
       (ctx, cb) ->
         {reviewer, issue} = ctx
-        robot.messageRoom "developers", "#{reviewer.login} さん、レビュアーにご指名ですー PR: #{issue.html_url}"
+        robot.messageRoom slack_team, "#{reviewer.login} さん、レビュアーにご指名ですー PR: #{issue.html_url}"
         if ghWithAvatar
           url = reviewer.avatar_url
           url = "#{url}t=#{Date.now()}" # cache buster
@@ -173,7 +173,7 @@ module.exports = (robot) ->
 
     ], (err, res) ->
       if err?
-        robot.messageRoom "developers", "an error occured.\n#{err}"
+        robot.messageRoom slack_team, "an error occured.\n#{err}"
 
     res.status(200).send 'ok'
 
