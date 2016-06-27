@@ -80,15 +80,14 @@ module.exports = (robot) ->
 
     data = req.body
     if data.action != 'labeled'
-      return res.end ""
+      return res.send ""
 
     if data.label == undefined
-      return res.end ""
-    end
+      return res.send ""
 
     label = data.label.name
     if labels.length != 0 and labels.indexOf(label) != -1
-      return res.end ""
+      return res.send ""
 
     repo = data.repository.name
     pr   = data.pull_request.number
