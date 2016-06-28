@@ -97,7 +97,7 @@ module.exports = (robot) ->
           cb null, {reviewers: res}
 
       (ctx, cb) ->
-        robot.messageRoom slack_team, "looking for the pr...\n#{prParams.user}, #{prParams.repo}, #{prParams.number}"
+        # robot.messageRoom slack_team, "looking for the pr...\n#{prParams.user}, #{prParams.repo}, #{prParams.number}"
         # check if pull req exists
         gh.pullRequests.get prParams, (err, res) ->
           return cb "error on getting pull request: #{err.toString()}" if err?
@@ -132,7 +132,7 @@ module.exports = (robot) ->
 
       (ctx, cb) ->
         {reviewer, issue} = ctx
-        robot.messageRoom slack_team, "#{reviewer.login} さん、レビュアーにご指名ですー PR: #{issue.html_url}"
+        robot.messageRoom slack_team, "#{reviewer.login} さん、レビュアーにご指名ですよー :blanca1:\n#{issue.html_url}"
         if ghWithAvatar
           url = reviewer.avatar_url
           url = "#{url}t=#{Date.now()}" # cache buster
