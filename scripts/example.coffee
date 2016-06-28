@@ -7,12 +7,21 @@
 #   Uncomment the ones you want to try and experiment with.
 #
 #   These are from the scripting documentation: https://github.com/github/hubot/blob/master/docs/scripting.md
+#
+# Commands:
+#   癒やされたい - 癒やし画像を表示します
 
 module.exports = (robot) ->
 
   robot.router.get "/", (req, res) ->
     res.send "ok"
 
+  healing_images = [
+    "https://www.dropbox.com/s/do0ymokl1hqt1xv/blanca.jpeg?dl=0"
+  ]
+
+  robot.hear "癒やされたい", (msg) ->
+    msg.send msg.random healing_images
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
