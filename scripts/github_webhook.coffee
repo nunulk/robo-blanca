@@ -7,6 +7,12 @@
 #   HUBOT_GITHUB_REVIEWER_TEAM (required)
 #     github team id. this script randomly picks a reviewer from this team members.
 #
+# Commands:
+#   hubot reviewer for <repo> <pull> - assigns random reviewer for pull request
+#   hubot reviewer show stats - proves the lotto has no bias
+#
+# Author:
+#   sakatam
 
 _         = require "underscore"
 async     = require "async"
