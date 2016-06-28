@@ -17,7 +17,7 @@ module.exports = (robot) ->
     res.send "ok"
 
   healing_images = [
-    "https://www.dropbox.com/s/do0ymokl1hqt1xv/blanca.jpeg?dl=0"
+    "https://dl.dropboxusercontent.com/s/do0ymokl1hqt1xv/blanca.jpeg"
   ]
 
   robot.hear "癒やされたい", (msg) ->
