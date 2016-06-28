@@ -8,36 +8,10 @@
 #
 #   These are from the scripting documentation: https://github.com/github/hubot/blob/master/docs/scripting.md
 
-s_to_a = (s) ->
-  console.log(s)
-  if s == undefined
-    return []
-
-  a =s.split(',').map((e) ->
-    return e.trim()
-  )
-
-  if a.length == 1 && a[0] == ''
-    return []
-
-  return a
-
 module.exports = (robot) ->
 
   robot.router.get "/", (req, res) ->
     res.send "ok"
-
-  robot.hear /label (.*)/i, (res) ->
-    labels        = s_to_a(process.env.HUBOT_REVIEWER_LOTTO_LABELS)
-    console.log(labels)
-    if labels.length == 0
-      res.send "all"
-    else
-      label = res.match[1]
-      if -1 == labels.indexOf(label)
-        res.send "skip"
-      else
-        res.send "matched=" + label
 
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
