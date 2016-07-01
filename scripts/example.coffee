@@ -26,7 +26,7 @@ module.exports = (robot) ->
     "https://dl.dropboxusercontent.com/s/n79desow2vw643u/blanca7.jpeg"
   ]
 
-  robot.hear "癒やされたい", (msg) ->
+  robot.hear "癒やされたい|癒されたい", (msg) ->
     msg.send msg.random healing_images
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
