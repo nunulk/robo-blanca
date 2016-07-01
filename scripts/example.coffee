@@ -18,7 +18,12 @@ module.exports = (robot) ->
 
   healing_images = [
     "https://dl.dropboxusercontent.com/s/do0ymokl1hqt1xv/blanca.jpeg",
-    "https://dl.dropboxusercontent.com/s/tgbn1bfl8pyrv3a/blanca2-l.png"
+    "https://dl.dropboxusercontent.com/s/tgbn1bfl8pyrv3a/blanca2-l.png",
+    "https://dl.dropboxusercontent.com/s/e98kpu10szeaqoj/blanca3.jpg",
+    "https://dl.dropboxusercontent.com/s/imp5k0s3qt4lcqc/blanca4.jpg",
+    "https://dl.dropboxusercontent.com/s/1ex24yt2255un4l/blanca5.jpg",
+    "https://dl.dropboxusercontent.com/s/k7omxhcfvvuq5q6/blanca6.jpeg",
+    "https://dl.dropboxusercontent.com/s/n79desow2vw643u/blanca7.jpeg"
   ]
 
   robot.hear "癒やされたい", (msg) ->
